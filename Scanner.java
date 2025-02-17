@@ -53,6 +53,24 @@ public class Scanner {
             case '>':
                 addToken(match('=')? GREATER_EQUAL  : GREATER);
                 break;
+            case '/':
+                if (match('/')) {
+                    // a comment goes until the end of the line
+                    while (peek() != '\n' && !isAtEnd()) advance();       
+                } else {
+                    addToken(SLASH);
+                }
+                break;
+            
+            case'':
+            case '\r':
+            case '\t':
+                // Ignore all whitespace characters
+                break;
+
+            case '\n':
+                line++;
+                break;
 
             default:
                 // need to also report character
@@ -68,6 +86,11 @@ public class Scanner {
 
         current++;
         return true;
+    }
+
+    private boolean peek() {
+        if (isAtEnd()) return '\0';
+        return source.charAt(current);
     }
 
     private boolean isAtEnd() {
