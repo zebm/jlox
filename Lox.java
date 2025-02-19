@@ -1,4 +1,4 @@
-package com.craftinginterpreters.lox;
+package jlox;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,16 +11,15 @@ import java.util.List;
 public class Lox {
     static boolean hadError = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.out.println("Usage: lox [script]");
+            System.out.println("Usage: jlox [script]");
             System.exit(64);
         } else if (args.length == 1) {
             runFile(args[0]);
         } else {
             runPrompt();
         }
-
     }
 
     /**
@@ -39,7 +38,7 @@ public class Lox {
     /**
      *  Interactive prompt function, runs uuser input until EOF
      */
-    private static void runPrompt() {
+    private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
