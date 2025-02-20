@@ -16,9 +16,10 @@ class Parser {
         return equality();
     }
 
+    // BINARY OPERATORS
 
      /** 
-    *  Implements the following grammar rule for the parser: 
+    *  Implements the equality grammar rule for the parser: 
     * 
     *  equality -> comparison ( ( "!=" | "==") comparison)* ;
     *
@@ -36,7 +37,7 @@ class Parser {
     }
 
     /** 
-    *  Implements the following grammar rule for the parser: 
+    *  Implements the comparison grammar rule for the parser: 
     * 
     * comparison -> term (( ">" | ">=" | "<" | "<=" ) term )* ;
     *
@@ -54,7 +55,7 @@ class Parser {
     }
 
     /**
-     * Implements the following grammar rule for the parser: 
+     * Implements the term grammar rule for the parser: 
      * 
      * term -> factor (( "-" | "+") factor )* ;
      * 
@@ -73,6 +74,12 @@ class Parser {
         return expr;
     }
 
+    /**
+     * Implements the factor grammar rule for the parser: 
+     * 
+     * factor -> unary (( "/" | "*" ) unary )* ;
+     * 
+     */
     private Expr factor() {
         Expr expr = unary();
 
@@ -83,6 +90,48 @@ class Parser {
         }
 
         return expr;
+    }
+
+    // UNARY OPERATORS
+
+    /**
+     * Implements the unary grammar rule for the parser: 
+     * 
+     * unary -> ( "!" | "-" ) unary 
+     *          | primary;
+     * 
+     */
+    private Expr unary() {
+        if (match(BANG, MINUS)) {
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+
+        return primary();
+    }
+
+    /**
+     * Implements the primary grammar rule for the parser: 
+     * 
+     * primary -> NUMBER | STRING | "true" | "false" | "nil"
+     *            | "(" expression ")" ;
+     * 
+     */
+    private Expr primary() {
+        if (match(FALSE)) return new Expr.Literal(false);
+        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(NIL)) return new Expr.Literal(null);
+
+        if (match(NUMBER, STRING)) {
+            return new Expr.Literal(previous().literal);
+        }
+
+        if (match(LEFT_PAREN)) {
+            Expr expr = expression();
+            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            return new Expr.Grouping(expr);
+        }
     }
 
     private boolean match(TokenType... types) {
