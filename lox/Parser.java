@@ -16,12 +16,69 @@ class Parser {
         return equality();
     }
 
+
+     /** 
+    *  Implements the following grammar rule for the parser: 
+    * 
+    *  equality -> comparison ( ( "!=" | "==") comparison)* ;
+    *
+    */
     private Expr equality() {
         Expr expr = comparison();
 
         while (match(BANG_EQUAL, EQUAL_EQUAL)) {
             Token operator = previous();
             Expr right = comparison();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    /** 
+    *  Implements the following grammar rule for the parser: 
+    * 
+    * comparison -> term (( ">" | ">=" | "<" | "<=" ) term )* ;
+    *
+    */
+    private Expr comparison() {
+        Expr expr = term();
+
+        while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+            Token operator = previous();
+            Expr right = term();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    /**
+     * Implements the following grammar rule for the parser: 
+     * 
+     * term -> factor (( "-" | "+") factor )* ;
+     * 
+     * TODO: Investigate a method for passing left associative
+     * series of binary operators - simplify redundant code
+     */
+    private Expr term() {
+        Expr expr = factor();
+
+        while (match(MINUS, PLUS)) {
+            Token operator = previous();
+            Expr right = factor();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr factor() {
+        Expr expr = unary();
+
+        while (match(SLASH, STAR)) {
+            Token operator = previous();
+            Expr right = unary();
             expr = new Expr.Binary(expr, operator, right);
         }
 
