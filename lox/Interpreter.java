@@ -107,13 +107,8 @@ class Interpreter implements Expr.Visitor<Object> {
                     return (double)left + (double)right;
                 }
 
-                if (left instanceof String && right instanceof String) {
-                    return (String)left + (String)right;
-                }
-
-                // If operand is a String, concat like Strings
                 if (left instanceof String || right instanceof String) {
-                    return (String)left + (String)right;
+                    return stringify(left) + stringify(right);
                 }
 
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
