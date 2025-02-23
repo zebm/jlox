@@ -65,6 +65,23 @@ class Parser {
         return new Stmt.Print(value);
     }
 
+    /**
+     * Implements variable declaration grammar rule for parser:
+     * 
+     *  varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+     */
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration");
+        return new Stmt.Var(name, initializer);
+    }
+
     /** 
     *  Implements the expression statment grammar rule for the parser: 
     * 
@@ -175,8 +192,10 @@ class Parser {
     /**
      * Implements the primary grammar rule for the parser: 
      * 
-     * primary -> NUMBER | STRING | "true" | "false" | "nil"
-     *            | "(" expression ")" ;
+     * primary -> "true" | "false" | "nil"
+     *            | NUMBER | STRING
+     *            | "(" expression ")" 
+     *            | IDENTIFIER;
      * 
      */
     private Expr primary() {
@@ -186,6 +205,10 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {
