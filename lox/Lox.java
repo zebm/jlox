@@ -75,7 +75,7 @@ public class Lox {
 
     // TODO: improve error reporting to be character precise see chapter 4
     static void report(int line, String where, String message) {
-        System.err.println("[line" + line + "] Error" + where + ":" + message);
+        System.err.println("[line " + line + "] Error" + where + ":" + message);
         hadError = true;
     }
 
