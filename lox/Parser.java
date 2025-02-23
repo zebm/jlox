@@ -1,7 +1,6 @@
 package jlox.lox;
 
 import java.util.List;
-
 import static jlox.lox.TokenType.*;
 
 class Parser {
@@ -12,6 +11,14 @@ class Parser {
 
     Parser(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError e) {
+            return null;
+        }
     }
 
     private Expr expression() {
@@ -134,6 +141,8 @@ class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
+        throw error(peek(), "Expected expression.");
     }
 
     private boolean match(TokenType... types) {
@@ -179,10 +188,10 @@ class Parser {
     }
     
     private void synchronize() {
-        adavance();
+        advance();
 
         while (!isAtEnd()) {
-            if previous().type == SEMICOLON return;
+            if (previous().type == SEMICOLON) return;
 
             switch (peek().type) {
                 case CLASS:
