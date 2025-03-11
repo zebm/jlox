@@ -353,7 +353,49 @@ class Parser {
             return new Expr.Unary(operator, right);
         }
 
-        return primary();
+        return call();
+    }
+
+    /**
+     * Implements the call grammar for the parser:
+     * 
+     * call         -> primary ( "(" arguments? ")" )* ;
+     * 
+     */
+    private Expr call() {
+        Expr expr = primary();
+
+        while (true) { 
+            if (match(LEFT_PAREN)) {
+                expr = finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+        /**
+     * Implements the call grammar (arguments list) for the parser:
+     * 
+     * arguments    -> expression ( "," expression )* ;
+     * 
+     */
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do { 
+                if (arguments.size() >= 255) {
+                    error(peek(), "Can't have more than 255 arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, arguments);
     }
 
     /**
