@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class Lox {
     private static final Interpreter interpreter = new Interpreter();
@@ -64,6 +63,12 @@ public class Lox {
         List<Stmt> statements = parser.parse();
 
         // Stop if there was a syntax error.
+        if (hadError) return;
+
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
+        // Stop if there was a resolution error.
         if (hadError) return;
 
         interpreter.interpret(statements);
