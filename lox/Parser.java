@@ -53,7 +53,8 @@ class Parser {
     /**
      * Implements the class declaration gramar for the parser:
      * 
-     * classDecl -> "class" IDENTIFIER "{" function* "}" ;
+     * classDecl -> "class" IDENTIFIER ( "<" IDENTIFIER )? 
+     *              "{" function* "}" ;
      * 
      */
     private Stmt classDeclaration() {
@@ -488,10 +489,9 @@ class Parser {
     /**
      * Implements the primary grammar rule for the parser: 
      * 
-     * primary -> "true" | "false" | "nil"
-     *            | NUMBER | STRING
-     *            | "(" expression ")" 
-     *            | IDENTIFIER;
+     * primary -> "true" | "false" | "nil" | "this"
+     *            | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+     *            | "super" "." IDENTIFIER;
      * 
      */
     private Expr primary() {
@@ -501,6 +501,13 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super.");
+            Token method = consume(IDENTIFIER, "Expect superclass method name.");
+            return new Expr.Super(keyword, method);
         }
 
         if (match(THIS)) return new Expr.This(previous());
